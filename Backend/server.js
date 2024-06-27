@@ -1,3 +1,4 @@
+import path from "path";
 import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./db/connectDB.js";
@@ -12,6 +13,9 @@ dotenv.config();
 
 connectDB();
 
+const PORT = process.env.PORT || 5000;
+const __dirname = path.resolve();
+
 cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
 	api_key: process.env.CLOUDINARY_API_KEY,
@@ -23,14 +27,23 @@ app.use(express.json({ limit: "50mb" })); // To parse JSON data in the req.body
 app.use(express.urlencoded({ extended: true })); // To parse form data in the req.body
 app.use(cookieParser());
 
-console.log("server");
+
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/messages", messageRoutes);
 
 
+// http://localhost:5000 => backend,frontend
 
-const PORT = process.env.PORT || 5000;
+
+if (process.env.NODE_ENV === "production") {
+	app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+	// react app
+	app.get("*", (req, res) => {
+		res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+	});
+}
 
 server.listen(PORT , ()=>console.log( `server started at http://localhost:${PORT}`));
