@@ -66,7 +66,7 @@ function Action({post}) {
     setIsOpen(() => !isOpen);
   };
 
-  
+ 
   const handleReply = async () => {
 		if (!user) return showToast("Error", "You must be logged in to reply to a post", "error");
 		if (isReplying) return;
@@ -125,7 +125,7 @@ function Action({post}) {
 
       {/* modal code  */}
       {isOpen && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div className=" bg-gray-700  rounded-lg shadow-lg w-full max-w-md mx-4" onClick={(e)=>e.preventDefault()}>
+        <div className=" bg-gray-700  rounded-lg shadow-lg w-full max-w-md mx-4" >
           <div className="flex justify-between items-center p-4 border-b">
             <h3 className="text-lg font-semibold">Reply</h3>
             <button
