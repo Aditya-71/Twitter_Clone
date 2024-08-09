@@ -6,111 +6,109 @@ import Conversation from "../component/Conversation";
 import useCustomToast from "../../Hooks/useCustomTost";
 import axios from "axios";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { conversationsAtom, selectedConversationAtom } from "../../atoms/messageAtom";
+import {
+  conversationsAtom,
+  selectedConversationAtom,
+} from "../../atoms/messageAtom";
 import userAtom from "../../atoms/userAtom";
-import {useSocket} from "../../context/socketContext.jsx"
-
+import { useSocket } from "../../context/socketContext.jsx";
 
 const ChatPage = () => {
-
-  const {showErrorToast} = useCustomToast();
-  const [conversations , setConversations] = useRecoilState(conversationsAtom);
-  const [selectedConversation , setSelectedConversation] = useRecoilState(selectedConversationAtom);
-  const [loadingConversations , setLoadingConversations] = useState(true);
+  const { showErrorToast } = useCustomToast();
+  const [conversations, setConversations] = useRecoilState(conversationsAtom);
+  const [selectedConversation, setSelectedConversation] = useRecoilState(
+    selectedConversationAtom
+  );
+  const [loadingConversations, setLoadingConversations] = useState(true);
   const [searchingUser, setSearchingUser] = useState(false);
   const [searchText, setSearchText] = useState("");
   const currentUser = useRecoilValue(userAtom);
   const { socket, onlineUsers } = useSocket();
 
-
   useEffect(() => {
-		socket?.on("messagesSeen", ({ conversationId }) => {
-			setConversations((prev) => {
-				const updatedConversations = prev.map((conversation) => {
-					if (conversation._id === conversationId) {
-						return {
-							...conversation,
-							lastMessage: {
-								...conversation.lastMessage,
-								seen: true,
-							},
-						};
-					}
-					return conversation;
-				});
-				return updatedConversations;
-			});
-		});
-	}, [socket, setConversations]);
+    socket?.on("messagesSeen", ({ conversationId }) => {
+      setConversations((prev) => {
+        const updatedConversations = prev.map((conversation) => {
+          if (conversation._id === conversationId) {
+            return {
+              ...conversation,
+              lastMessage: {
+                ...conversation.lastMessage,
+                seen: true,
+              },
+            };
+          }
+          return conversation;
+        });
+        return updatedConversations;
+      });
+    });
+  }, [socket, setConversations]);
 
   const handleConversationSearch = async (e) => {
-		e.preventDefault();
-    if(searchingUser)return;
-		setSearchingUser(true);
-		try {
-			const response = await axios(`/api/users/profile/${searchText}`);
-			const searchedUser = response.data;
+    e.preventDefault();
+    if (searchingUser) return;
+    setSearchingUser(true);
+    try {
+      const response = await axios(`/api/users/profile/${searchText}`);
+      const searchedUser = response.data;
 
-			const messagingYourself = (searchedUser._id === currentUser._id);
-			if (messagingYourself) {
-				showErrorToast( "You cannot message yourself");
-				return;
-			}
+      const messagingYourself = searchedUser._id === currentUser._id;
+      if (messagingYourself) {
+        showErrorToast("You cannot message yourself");
+        return;
+      }
 
-			const conversationAlreadyExists = conversations.find(
-				(conversation) => conversation.participants[0]._id === searchedUser._id
-			);
+      const conversationAlreadyExists = conversations.find(
+        (conversation) => conversation.participants[0]._id === searchedUser._id
+      );
 
-			if (conversationAlreadyExists) {
-				setSelectedConversation({
-					_id: conversationAlreadyExists._id,
-					userId: searchedUser._id,
-					username: searchedUser.username,
-					userProfilePic: searchedUser.profilePic,
-				});
-				return;
-			}
+      if (conversationAlreadyExists) {
+        setSelectedConversation({
+          _id: conversationAlreadyExists._id,
+          userId: searchedUser._id,
+          username: searchedUser.username,
+          userProfilePic: searchedUser.profilePic,
+        });
+        return;
+      }
 
-			const mockConversation = {
-				mock: true,
-				lastMessage: {
-					text: "",
-					sender: "",
-				},
-				_id: Date.now(),
-				participants: [
-					{
-						_id: searchedUser._id,
-						username: searchedUser.username,
-						profilePic: searchedUser.profilePic,
-					},
-				],
-			};
-			setConversations((prevConvs) => [...prevConvs, mockConversation]);
-		} catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.error
-      ) {
+      const mockConversation = {
+        mock: true,
+        lastMessage: {
+          text: "",
+          sender: "",
+        },
+        _id: Date.now(),
+        participants: [
+          {
+            _id: searchedUser._id,
+            username: searchedUser.username,
+            profilePic: searchedUser.profilePic,
+          },
+        ],
+      };
+      setConversations((prevConvs) => [...prevConvs, mockConversation]);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.error) {
         console.log(error.response.data.error);
         showErrorToast(error.response.data.error);
       } else {
         showErrorToast("Network Error");
       }
-		} finally {
-			setSearchingUser(false);
-		}
-	};
+    } finally {
+      setSearchingUser(false);
+    }
+  };
 
   useEffect(() => {
-		const getConversations = async () => {
-			try {
-				const response = await axios.get("/api/messages/conversations");
-				
-				console.log(response.data);
-				setConversations(response.data);
-			} catch (error) {
+    const getConversations = async () => {
+      try {
+        const response = await axios.get("/api/messages/conversations");
+
+        console.log(response.data);
+        setConversations(response.data);
+      } catch (error) {
         if (
           error.response &&
           error.response.data &&
@@ -121,13 +119,13 @@ const ChatPage = () => {
         } else {
           showErrorToast("Network Error");
         }
-			} finally {
-				setLoadingConversations(false);
-			}
-		};
+      } finally {
+        setLoadingConversations(false);
+      }
+    };
 
-		getConversations();
-	}, [showErrorToast, setConversations]);
+    getConversations();
+  }, [showErrorToast, setConversations]);
   return (
     <div className="absolute left-1/2 w-full md:w-4/5 lg:w-[750px] p-4 transform -translate-x-1/2">
       <div className="flex flex-col md:flex-row gap-4 mx-auto max-w-full">
@@ -140,10 +138,12 @@ const ChatPage = () => {
                 placeholder="Search for a user"
                 className="p-2 border rounded text-black font-normal"
                 onChange={(e) => setSearchText(e.target.value)}
+                name="search" 
+                id="search-input" 
               />
               <button
+                type="submit" 
                 className="p-2 bg-gray-300 rounded"
-                onClick={handleConversationSearch}
               >
                 <IoSearch />
               </button>

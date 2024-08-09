@@ -84,6 +84,7 @@ const MessageInput = ({ setMessages }) => {
               placeholder="Type a message"
               onChange={(e) => setMessageText(e.target.value)}
               value={messageText}
+              name="input-text"
             />
             <button
               type="submit"

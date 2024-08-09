@@ -76,6 +76,7 @@ const signupUser = async (req, res) => {
 // login User
 const loginUser = async (req, res) => {
 	try {
+		console.log("gautam");
 		const { username, password } = req.body;
 		const user = await User.findOne({ username });
 		const isPasswordCorrect = await bcrypt.compare(password, user?.password || "");  // give empty string because  if the user not exist than bcrypt compare password which is string with the null and giving the error so we give empty string
