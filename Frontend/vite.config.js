@@ -2,20 +2,26 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import dotenv from "dotenv";
 
+// Load environment variables from .env file
 dotenv.config();
 
-// console.log('VITE_BASE_URL:', import.meta.env.BASE_URL);
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    // Get rid of the CORS error
     proxy: {
       "/api": {
-        target: process.env.VITE_BASE_URL ,
+        target: process.env.VITE_BASE_URL,
         changeOrigin: true,
-        secure: false, // because it is not https , it is http
+        secure: false, // Use this if you're working with HTTP and not HTTPS
+      },
+    },
+  },
+  build: {
+    outDir: 'dist', // Directory to output the build files
+    rollupOptions: {
+      input: {
+        main: 'index.html', // Main HTML file for the build
       },
     },
   },
