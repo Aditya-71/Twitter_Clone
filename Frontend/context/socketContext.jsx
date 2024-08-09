@@ -2,9 +2,6 @@ import io from "socket.io-client";
 import { createContext, useContext, useEffect, useState } from "react";
 import {useRecoilValue} from "recoil";
 import userAtom from "../atoms/userAtom"
-import dotenv from "dotenv";
-
-dotenv.config();
 
 
 const SocketContext = createContext();
@@ -19,7 +16,7 @@ export const SocketContextProvider = ({children}) =>{
 	const user = useRecoilValue(userAtom);
 
 	useEffect(() => {
-		const socket = io(process.env.BASE_URL, {
+		const socket = io(import.meta.env.VITE_BASE_URL, {
 			query: {
 				userId: user?._id,
 			},
