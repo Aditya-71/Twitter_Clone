@@ -19,7 +19,7 @@ export const SocketContextProvider = ({children}) =>{
 	const user = useRecoilValue(userAtom);
 
 	useEffect(() => {
-		const socket = io(Process.env.BASE_URL, {
+		const socket = io(process.env.BASE_URL, {
 			query: {
 				userId: user?._id,
 			},
