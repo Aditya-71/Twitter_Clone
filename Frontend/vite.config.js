@@ -1,5 +1,8 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // console.log('VITE_BASE_URL:', import.meta.env.BASE_URL);
 // https://vitejs.dev/config/
