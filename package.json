@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-  "dev": "nodemon Backend/server.js",
-  "start": "node Backend/server.js",
-  "build": "npm install && npm run build --prefix Frontend && cp -r Frontend/dist Backend/frontend"
-}
+    "dev": " cross-env NODE_ENV=development nodemon backend/server.js",
+    "start": " cross-env NODE_ENV=production node backend/server.js",
+    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend "
+  },
   "type": "module",
   "keywords": [],
   "author": "",
